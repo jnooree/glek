@@ -1,0 +1,60 @@
+homepage: &homepage https://github.com/gedex/glek
+description: &description Export GitHub issue labels into gembel JSON format
+project_name: glek
+release:
+  github:
+    owner: gedex
+    name: glek
+builds:
+- goos:
+  - linux
+  - darwin
+  - windows
+  goarch:
+  - amd64
+  - "386"
+  goarm:
+  - "6"
+  main: .
+  ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+  binary: glek
+  hooks: {}
+archive:
+  format: tar.gz
+  name_template: '{{ .Binary }}_{{.Version}}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{
+    .Arm }}{{ end }}'
+  files:
+  - LICENSE
+  - README*
+  replacements:
+    386: i386
+    amd64: x86_64
+  format_overrides:
+    - goos: windows
+      format: zip
+brew:
+  github:
+    owner: gedex
+    name: homebrew-tap
+  commit_author:
+    name: gedex
+    email: admin@gedex.web.id
+  folder: Formula
+  homepage: *homepage
+  description: *description
+  dependencies:
+    - git
+fpm:
+  homepage: *homepage
+  description: *description
+  maintainer: Akeda Bagus <admin@gedex.web.id>
+  license: MIT
+  vendor: Glek
+  formats:
+    - deb
+  dependencies:
+    - git
+snapshot:
+  name_template: SNAPSHOT-{{ .Commit }}
+build:
+  hooks: {}
