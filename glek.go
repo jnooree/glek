@@ -27,8 +27,10 @@ var (
 // default GitHub labels.
 var defaultLabels = [...]string{
 	"bug",
+	"documentation",
 	"duplicate",
 	"enhancement",
+	"good first issue",
 	"help wanted",
 	"invalid",
 	"question",
@@ -36,14 +38,17 @@ var defaultLabels = [...]string{
 }
 
 type Label struct {
-	Name    string `json:"name"`
-	Color   string `json:"color"`
-	Replace string `json:"replace,omitempty"`
+	Name        string `json:"name"`
+	Color       string `json:"color"`
+	Replace     string `json:"replace,omitempty"`
+	Description string `json:"description,omitempty"`
 }
 
 type Gembel struct {
 	Labels       []Label  `json:"labels"`
+	Deletes      []string `json:"deletes,omitempty"`
 	Repositories []string `json:"repositories"`
+	Strict       bool     `json:"strict"`
 }
 
 func main() {
@@ -74,8 +79,11 @@ func main() {
 func out(labels []Label) {
 	gembel := Gembel{
 		Labels:       labels,
+		Deletes:      []string{"label-to-delete"},
 		Repositories: []string{"owner/repo"},
+		Strict:       false,
 	}
+
 	b, err := json.Marshal(gembel)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
@@ -105,8 +113,9 @@ func getRepoLabels(repoPath string) (labels []Label, err error) {
 		}
 		for _, ghLabel := range repoLabels {
 			label = Label{
-				Name:  ghLabel.GetName(),
-				Color: ghLabel.GetColor(),
+				Name:        ghLabel.GetName(),
+				Color:       ghLabel.GetColor(),
+				Description: ghLabel.GetDescription(),
 			}
 			replaceDefaults(&label)
 
